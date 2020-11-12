@@ -49,7 +49,6 @@ export default function Home() {
   }, [enterpriseType])
 
   const enterprisesFiltered = useCallback(async (input) => {
-    console.log('callback', input)
     try {
       let response = await api.get(`/enterprises?name=${input}`)
 
