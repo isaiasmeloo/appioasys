@@ -56,6 +56,25 @@ Este documento `README.md` tem como objetivo fornecer as informações necessár
 * Utilização de linters ou outras ferramentas de análise estática
 * Testes unitários, interface, etc.
 
-### Sobrou tempo?
-Aqui na **ioasys** nós prezamos muito pela autonomia e contribuição dos nossos funcionários. Então, caso tenha sobrado tempo, sinta-se livre para sugerir alguma melhoria neste desafio :)
+### 🛠 Como executar o projeto
+
+```bash
+# Clone este repositório
+$ git clone https://bitbucket.org/isaiasmeloo/empresas-react-native.git
+
+# Acesse a pasta do projeto no terminal/cmd
+$ cd empresas-react-native
+
+# Instale as dependências
+$ npm install || yarn
+
+# Dependências nativas (iOS)
+$ cd ios/ && pod install && cd ..
+
+# Execute a aplicação
+$ yarn ios || yarn android
+
+* Requer XCode >= 11.6
+
+```
 
