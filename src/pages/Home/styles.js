@@ -23,6 +23,14 @@ export const Tag = styled.TouchableOpacity`
   margin-right: 10px;
 `;
 
+export const ContainerCardEnterprise = styled.View`
+  flex: 1;
+  justify-content: flex-start;
+  padding: 0 20px;
+  background-color: #FFFFFF;
+  margin-top: 10px;
+`;
+
 export const Image = styled.Image`
   width: 80px;
   height: 80px;

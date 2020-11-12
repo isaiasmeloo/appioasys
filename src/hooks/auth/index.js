@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import api from '../../services/api';
+import { Alert } from 'react-native';
 
 const AuthContext = createContext();
 
@@ -71,6 +72,7 @@ function AuthProvider({ children }) {
       }
     } catch (error) {
       console.log('error request ', error)
+      Alert.alert('Error', 'Check your credentials')
     }
   }, [])
 

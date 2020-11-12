@@ -6,7 +6,16 @@ import { useAuth } from '../../hooks/auth'
 import Header from '../../components/Header';
 import api from '../../services/api';
 
-import { Container, SearchInput, Tag, Image, EnterpriseName, EnterpriseType, EnterpriseTypeName } from './styles';
+import {
+  Container,
+  SearchInput,
+  Tag,
+  ContainerCardEnterprise,
+  Image,
+  EnterpriseName,
+  EnterpriseType,
+  EnterpriseTypeName
+} from './styles';
 
 export default function Home() {
   const [enterprises, setEnterprises] = useState([])
@@ -95,8 +104,8 @@ export default function Home() {
         />
       </Header>
 
-      <View style={{ flex: 1, justifyContent: 'flex-start', paddingHorizontal: 20, backgroundColor: '#FFFFFF', marginTop: 10 }}>
-        <ScrollView contentContainerStyle={{ maxHeight: 60 }} horizontal showsHorizontalScrollIndicator={false}>
+      <ContainerCardEnterprise>
+        <ScrollView style={{height: 60, maxHeight: 60}} horizontal showsHorizontalScrollIndicator={false}>
           <Tag
             style={{ backgroundColor: !enterpriseType ? '#C61B63' : '#FFF' }}
             onPress={() => {
@@ -162,7 +171,7 @@ export default function Home() {
             )}
           />
         )}
-      </View>
+      </ContainerCardEnterprise>
 
     </Container>
   );
