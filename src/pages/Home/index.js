@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, Text, TextInput, View, TouchableOpacity, ScrollView } from 'react-native';
+import { FlatList, Text, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '../../hooks/auth'
 import Header from '../../components/Header';
 import api from '../../services/api';
-import { useNavigation } from '@react-navigation/native';
+
+import { Container, SearchInput, Tag, Image, EnterpriseName, EnterpriseType, EnterpriseTypeName } from './styles';
 
 export default function Home() {
   const [enterprises, setEnterprises] = useState([])
-  const [search, setSearch] = useState("")
   const [enterpriseType, setEnterpriseType] = useState(null)
   const [filters, setFilters] = useState([])
 
@@ -16,10 +17,10 @@ export default function Home() {
   const { navigate } = useNavigation()
 
   useEffect(() => {
-    console.log('useEffect 1')
     async function loadEnterprises() {
       try {
         let query_types = `?enterprise_types=${enterpriseType}`
+
         let response
         if (enterpriseType) {
           response = await api.get(`/enterprises${query_types}`)
@@ -34,51 +35,87 @@ export default function Home() {
           handleTypes(data)
         }
       } catch (error) {
-        if (error.response.status === 401) {
-          console.log('TOKEN EXPIRADO')
-          // await signOut()
-        }
         console.log('error request ', error)
+        if (error.response?.status === 401) {
+          console.log('TOKEN EXPIRADO')
+          await signOut()
+        } else {
+          Alert.alert('Error', 'Internal error ')
+        }
       }
     }
 
     loadEnterprises()
   }, [enterpriseType])
 
-  function handleTypes(data) {
-    const obj = data.reduce((acc, cur) => ({ ...acc, [cur.enterprise_type.enterprise_type_name]: cur.enterprise_type.id }), {})
-    const keys = Object.keys(obj)
+  const enterprisesFiltered = useCallback(async (input) => {
+    console.log('callback', input)
+    try {
+      let response = await api.get(`/enterprises?name=${input}`)
 
-    setFilters(keys)
+      if (response.status === 200) {
+        const data = response.data.enterprises
+
+        setEnterprises(data)
+        // handleTypes(data)
+      }
+    } catch (error) {
+      console.log('error request ', error)
+      if (error.response?.status === 401) {
+        console.log('TOKEN EXPIRADO')
+        await signOut()
+      } else {
+        Alert.alert('Error', 'Internal error ')
+      }
+    }
+  }, [])
+
+  function handleTypes(data = []) {
+    const obj = data.reduce((acc, cur) => (
+      {
+        ...acc,
+        [cur.enterprise_type.enterprise_type_name]: cur.enterprise_type
+      }
+    ), {})
+    let array = []
+
+    for (i in obj) {
+      array.push(obj[i])
+    }
+
+    setFilters(array)
   }
 
   return (
-    <View
-      style={{ flex: 1, width: '100%' }}
-    >
+    <Container>
+      <Header>
+        <SearchInput
+          placeholder="Search"
+          placeholderTextColor="#6E7E99"
+          onChangeText={text => enterprisesFiltered(text)}
+        />
+      </Header>
 
-      <Header />
-
-      <View style={{ flex: 1, paddingHorizontal: 20, backgroundColor: '#FFFFFF', marginTop: 10 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {filters && filters.map(filter => (
-            <TouchableOpacity key={filter} style={{
-              height: 40,
-              borderWidth: 1,
-              borderColor: "#EAEAEA",
-              borderRadius: 6,
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 100,
-              marginVertical: 10,
-              marginRight: 10
+      <View style={{ flex: 1, justifyContent: 'flex-start', paddingHorizontal: 20, backgroundColor: '#FFFFFF', marginTop: 10 }}>
+        <ScrollView contentContainerStyle={{ maxHeight: 60 }} horizontal showsHorizontalScrollIndicator={false}>
+          <Tag
+            style={{ backgroundColor: !enterpriseType ? '#C61B63' : '#FFF' }}
+            onPress={() => {
+              setEnterpriseType(null)
             }}
+          >
+            <Text style={{ color: !enterpriseType ? '#FFF' : '#000' }}>All</Text>
+          </Tag>
+          {filters && filters.map(filter => (
+            <Tag
+              key={filter.id}
+              style={{ backgroundColor: filter.id === enterpriseType ? '#C61B63' : '#FFF' }}
               onPress={() => {
-                setEnterpriseType('11')
+                setEnterpriseType(filter.id)
               }}
             >
-              <Text>{filter}</Text>
-            </TouchableOpacity>
+              <Text style={{ color: filter.id === enterpriseType ? '#FFF' : '#000' }}>{filter.enterprise_type_name}</Text>
+            </Tag>
           ))
           }
 
@@ -89,6 +126,8 @@ export default function Home() {
             keyExtractor={item => String(item.id)}
             data={enterprises}
             showsVerticalScrollIndicator={false}
+            style={{ flexGrow: 1 }}
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }}
             renderItem={({ item: enterprise, index }) => (
               <TouchableOpacity
                 onPress={() => {
@@ -97,7 +136,6 @@ export default function Home() {
                 activeOpacity={0.8}
                 key={String(enterprise.id)}
                 style={[{
-                  // flex: 1,
                   flexDirection: 'row',
                   width: '100%',
                   paddingVertical: 10,
@@ -107,21 +145,18 @@ export default function Home() {
                   : {}
                 ]}
               >
-                <View style={{ marginRight: 8 }}>
-                  <Image
-                    source={{ uri: `https://empresas.ioasys.com.br/${enterprise.photo}` }}
-                    style={{ width: 80, height: 80, borderRadius: 6 }}
-                  />
-                </View>
+                <Image
+                  source={{ uri: `https://empresas.ioasys.com.br/${enterprise.photo}` }}
+                />
                 <View style={{ flex: 1, justifyContent: 'space-between' }}>
                   <View>
-                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{enterprise.enterprise_name}</Text>
+                    <EnterpriseName>{enterprise.enterprise_name}</EnterpriseName>
                     <Text style={{ color: '#808080' }}>{enterprise.city}</Text>
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
-                    <View style={{ backgroundColor: '#C61B63', width: 110, borderRadius: 6, height: 22, justifyContent: 'center' }}>
-                      <Text style={{ fontWeight: 'bold', color: '#F5F5F5', textAlign: 'center' }}>{enterprise.enterprise_type?.enterprise_type_name}</Text>
-                    </View>
+                    <EnterpriseType>
+                      <EnterpriseTypeName>{enterprise.enterprise_type?.enterprise_type_name}</EnterpriseTypeName>
+                    </EnterpriseType>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -130,6 +165,6 @@ export default function Home() {
         )}
       </View>
 
-    </View >
+    </Container>
   );
 }

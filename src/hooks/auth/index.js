@@ -11,8 +11,12 @@ function AuthProvider({ children }) {
   const [client, setClient] = useState(null)
   const [uid, setUid] = useState(null)
 
+  const [loading, setLoading] = useState(null)
+
   useEffect(() => {
     async function loadStoragedData() {
+      setLoading(true)
+
       const [investor, access_token, client, uid] = await AsyncStorage.multiGet(
         [
           '@ioasys:investor',
@@ -26,13 +30,13 @@ function AuthProvider({ children }) {
         api.defaults.headers.common['access-token'] = `${JSON.parse(access_token[1])}`;
         api.defaults.headers.client = `${JSON.parse(client[1])}`;
         api.defaults.headers.uid = `${JSON.parse(uid[1])}`;
-        console.log('HEADER ', api.defaults.headers['access-token'])
 
         setInvestor(JSON.parse(investor[1]));
         setAccessToken(JSON.parse(access_token[1]));
         setClient(JSON.parse(client[1]));
         setUid(JSON.parse(uid[1]));
       }
+      setLoading(false)
     }
 
     loadStoragedData()
@@ -54,6 +58,10 @@ function AuthProvider({ children }) {
           ['@ioasys:uid', JSON.stringify(uid)],
           ['@ioasys:investor', JSON.stringify(response.data?.investor)]
         ])
+
+        api.defaults.headers['access-token'] = `${accessToken}`;
+        api.defaults.headers.client = `${client}`;
+        api.defaults.headers.uid = `${uid}`;
 
         setAccessToken(JSON.stringify(accessToken));
         setClient(JSON.stringify(client));
@@ -95,7 +103,8 @@ function AuthProvider({ children }) {
         client,
         uid,
         signIn,
-        signOut
+        signOut,
+        loading
       }}
     >
       {children}

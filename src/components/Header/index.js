@@ -1,25 +1,23 @@
 import React from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 
-// import { Container } from './styles';
+import { useAuth } from '../../hooks/auth';
 
-export default function Header() {
+import { Container, HeaderTitle, SearchInput, ContainerHeader } from './styles';
+
+export default function Header({ children }) {
+  const { signOut } = useAuth();
+
   return (
-    <View
-      style={{
-        minHeight: 180,
-        width: '100%',
-        padding: 20,
-        paddingTop: 50,
-        backgroundColor: '#FFFFFF',
-        justifyContent: 'space-around'
-      }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Enterprises</Text>
-      <TextInput
-        style={{ height: 50, borderRadius: 6, backgroundColor: '#F5F5F5', padding: 15 }}
-        placeholder="Search"
-        placeholderTextColor="#6E7E99"
-      />
-    </View>
+    <Container>
+      <ContainerHeader>
+        <HeaderTitle>Enterprises</HeaderTitle>
+        <TouchableOpacity onPress={signOut}>
+          <Icon name="power" size={20} color="#000" />
+        </TouchableOpacity>
+      </ContainerHeader>
+      {children}
+    </Container>
   );
 }
