@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import Loading from '../../components/Loading';
+
 import { useAuth } from '../../hooks/auth'
 import Header from '../../components/Header';
 import api from '../../services/api';
@@ -22,12 +24,15 @@ export default function Home() {
   const [enterpriseType, setEnterpriseType] = useState(null)
   const [filters, setFilters] = useState([])
 
+  const [isLoading, setIsLoading] = useState(false)
+
   const { signOut } = useAuth()
   const { navigate } = useNavigation()
 
   useEffect(() => {
     async function loadEnterprises() {
       try {
+        setIsLoading(true)
         let query_types = `?enterprise_types=${enterpriseType}`
 
         let response
@@ -43,7 +48,9 @@ export default function Home() {
           setEnterprises(data)
           handleTypes(data)
         }
+        setIsLoading(false)
       } catch (error) {
+        setIsLoading(false)
         console.log('error request ', error)
         if (error.response?.status === 401) {
           console.log('TOKEN EXPIRADO')
@@ -103,9 +110,10 @@ export default function Home() {
           onChangeText={text => enterprisesFiltered(text)}
         />
       </Header>
+      {isLoading && <Loading />}
 
       <ContainerCardEnterprise>
-        <ScrollView style={{height: 60, maxHeight: 60}} horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView style={{ height: 60, maxHeight: 60 }} horizontal showsHorizontalScrollIndicator={false}>
           <Tag
             style={{ backgroundColor: !enterpriseType ? '#C61B63' : '#FFF' }}
             onPress={() => {
