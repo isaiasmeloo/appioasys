@@ -78,3 +78,5 @@ $ yarn ios || yarn android
 
 ```
 
+### Preview
+![N|Solid](preview.png)
