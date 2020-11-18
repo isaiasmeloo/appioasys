@@ -60,10 +60,10 @@ Este documento `README.md` tem como objetivo fornecer as informações necessár
 
 ```bash
 # Clone este repositório
-$ git clone https://bitbucket.org/isaiasmeloo/empresas-react-native.git
+$ git clone https://github.com/isaiasmeloo/appioasys.git
 
 # Acesse a pasta do projeto no terminal/cmd
-$ cd empresas-react-native
+$ cd appioasys
 
 # Instale as dependências
 $ npm install || yarn
